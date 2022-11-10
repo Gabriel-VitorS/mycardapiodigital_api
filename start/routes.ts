@@ -24,4 +24,13 @@ Route.group(()=>{
   Route.get('/', async () => {
     return { hello: 'world' }
   })
+
+  Route.post('/register', 'CompaniesController.store')
+  Route.post('/verify_email', 'CompaniesController.verifyIfEmailExist')
+  Route.post('/login', 'CompaniesController.login')
+  
+  Route.group(()=>{
+    Route.resource('/configuration', 'ConfigurationsController').apiOnly()
+  }).middleware('auth')
+
 }).prefix('/api')
