@@ -24,6 +24,22 @@ export default class CompaniesController {
         ])
     })
 
+    private putRequestValidate = schema.create({
+        name: schema.string.optional([
+            rules.minLength(3)
+        ]),
+        cpf_cnpj: schema.string.optional([
+            rules.minLength(11),
+            rules.maxLength(14)
+        ]),
+        email: schema.string.optional([
+            rules.email()
+        ]),
+        password: schema.string.optional([
+            rules.confirmed()
+        ])
+    })
+
     public async verifyIfEmailExist({request, response}:HttpContextContract){
         try {
             const email = await Database.from('companies').where('email', request.input('email'))
@@ -36,7 +52,8 @@ export default class CompaniesController {
         } catch (error) {
             response.status(500)
             return {
-                message: 'Server error'
+                message: 'Server error',
+                error: error
             }
         }
 
@@ -69,13 +86,14 @@ export default class CompaniesController {
         } catch (error) {
             response.status(500)
             return {
-                message: 'Server error'
+                message: 'Server error',
+                error: error
             }
         }
 
     }
 
-    public async login({request, auth}:HttpContextContract){
+    public async login({request, auth, response}:HttpContextContract){
         const body = request.all()
 
         const postRequestValidate = schema.create({
@@ -87,11 +105,76 @@ export default class CompaniesController {
             ]),
         })
 
-        await request.validate({schema: postRequestValidate})
+        try {
+            await request.validate({schema: postRequestValidate})
 
-        const token =  await auth.use('api').attempt(body.email, body.password)
+            const token =  await auth.use('api').attempt(body.email, body.password)
+    
+            return {data: token}
+        } catch (error) {
+            response.status(500)
+            return{
+                message: 'Server error',
+                error: error
+            }
+        }
 
-        return {data: token}
+
+    }
+
+    public async update({request, response, auth}:HttpContextContract){
+        const body = request.all()
+        const companyAuth = auth.user
+        const company = await Company.findOrFail(companyAuth?.id)
+
+        await request.validate({schema: this.putRequestValidate})
+
+        if(body.email){
+            const findEmail = await Database.from('companies').where('email', body.email)
+            
+            if(Object.keys(findEmail).length !== 0){
+                if(findEmail[0].id !== companyAuth?.id){
+                    response.status(406)
+                    return {message: 'email field already exists', email: findEmail}
+                }else{
+                    company.email = body.email
+                }
+                
+            }else{
+                company.email = body.email
+            }
+        }
+
+        if(body.password){
+            const hashedPassowrd = await Hash.make(body.password)            
+
+            company.password = hashedPassowrd
+        }
+
+        if(body.name)
+            company.name = body.name
+        
+        
+        if(body.cpf_cnpj)
+            company.cpf_cnpj = body.cpf_cnpj
+        
+        
+        try {
+            await company.save()
+
+            return {
+                message: 'Company successfully updated',
+                data: company.id
+            }
+
+        } catch (error) {
+            response.status(500)
+            return{
+                message: 'Server error',
+                error: error
+            }
+        }
+        
     }
 
 }

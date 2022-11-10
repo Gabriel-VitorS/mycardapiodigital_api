@@ -30,6 +30,9 @@ Route.group(()=>{
   Route.post('/login', 'CompaniesController.login')
   
   Route.group(()=>{
+
+    Route.put('/company', 'CompaniesController.update')
+
     Route.resource('/configuration', 'ConfigurationsController').apiOnly()
   }).middleware('auth')
 
