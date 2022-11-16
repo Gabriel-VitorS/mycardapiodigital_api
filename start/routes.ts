@@ -34,6 +34,8 @@ Route.group(()=>{
     Route.put('/company', 'CompaniesController.update')
 
     Route.resource('/configuration', 'ConfigurationsController').apiOnly()
+    Route.post('/configuration/verify_url', 'ConfigurationsController.verifyIfUrlExist')
+    
   }).middleware('auth')
 
 }).prefix('/api')
