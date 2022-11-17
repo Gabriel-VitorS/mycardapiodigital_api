@@ -117,16 +117,23 @@ export default class ConfigurationsController extends Controller {
     public async destroy({params, auth, response}:HttpContextContract){
         const id = params.id
         const companyAuth: any = auth.user 
+        
 
         try {
-            const configuration = await Database.from('configurations').where('id', id).where('company_id', companyAuth.id).first()
+                        
+            const configuration = await Configuration.find(id) 
 
-            if(configuration){
+            if(!configuration){
                 response.status(404)
                 return {message:'Configuration not find'}
             }
 
-            await (await Configuration.findOrFail(configuration.id)).delete()    
+            if(configuration.company_id !== companyAuth.id){
+                response.status(404)
+                return {message:'Configuration not find'}
+            }
+            
+            await configuration.delete()    
             return {message:'Configuration deleted successfully', data: configuration.id}
 
         } catch (error) {
