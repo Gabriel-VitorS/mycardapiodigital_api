@@ -35,6 +35,9 @@ Route.group(()=>{
 
     Route.resource('/configuration', 'ConfigurationsController').apiOnly()
     Route.post('/configuration/verify_url', 'ConfigurationsController.verifyIfUrlExist')
+
+    Route.resource('/category', 'CategoriesController').apiOnly()
+    Route.post('/category/verify_order', 'CategoriesController.verifyOrderExists')
     
   }).middleware('auth')
 
