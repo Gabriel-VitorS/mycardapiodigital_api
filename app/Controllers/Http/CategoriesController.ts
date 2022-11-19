@@ -7,10 +7,10 @@ import Category from 'App/Models/Category'
 export default class CategoriesController {
 
     private requestValidate = schema.create({
-        name_category: schema.string([
+        name: schema.string([
             rules.minLength(3)
         ]),
-        category_order: schema.number()
+        order: schema.number()
     })
 
     public async verifyOrderExists({auth, response, request}:HttpContextContract){
@@ -19,9 +19,9 @@ export default class CategoriesController {
         
         try {
 
-            await request.validate({ schema: schema.create({ category_order: schema.number() }) })
+            await request.validate({ schema: schema.create({ order: schema.number() }) })
 
-            const order = await Database.from('categories').where('company_id', companyAuth.id).where('category_order', body.category_order).first()
+            const order = await Database.from('categories').where('company_id', companyAuth.id).where('order', body.order).first()
 
             if( (order) && order.company_id === companyAuth.id){
                 return {
@@ -46,17 +46,18 @@ export default class CategoriesController {
     public async store({auth, response, request}:HttpContextContract){
         const body = request.all()
         const companyAuth: any = auth.user
+        //const category = await Category.create(body)
         
         try {
 
             await request.validate({schema: this.requestValidate})
 
-            const order = await Database.from('categories').where('company_id', companyAuth.id).where('category_order', body.category_order).first()
+            const order = await Database.from('categories').where('company_id', companyAuth.id).where('order', body.order).first()
 
             if( (order) && order.company_id === companyAuth.id){
                 response.status(406)
                 return {
-                    message: 'category_order field already exists'
+                    message: 'order field already exists'
                 }
             }
 
@@ -92,18 +93,18 @@ export default class CategoriesController {
                 return {message:'Configuration not find'}
             }
     
-            const order = await Database.from('categories').where('company_id', companyAuth.id).where('category_order', body.category_order).first()
+            const order = await Database.from('categories').where('company_id', companyAuth.id).where('order', body.order).first()
     
-            if( (order) && order.company_id === companyAuth.id && order.category_order != body.category_order){
+            if( (order) && order.company_id === companyAuth.id && order.order != body.order){
                 response.status(406)
                 return {
-                    message: 'category_order field already exists'
+                    message: 'order field already exists'
                 }
             }
     
-            category.name_category = body.name_category
+            category.name = body.name
     
-            category.category_order = body.category_order
+            category.order = body.order
     
             category.save()
     
@@ -158,15 +159,15 @@ export default class CategoriesController {
             await request.validate({schema: 
                     schema.create({
                     page: schema.number.optional(),
-                    name_category: schema.string.optional()
+                    name: schema.string.optional()
                     })
                 })
 
             const categories = await Database.from('categories').where('company_id', companyAuth.id)
                             .andWhere((query)=>{
 
-                                if(body.name_category)
-                                    query.from('categories').where('name_category', 'like',`%${body.name_category}%`)
+                                if(body.name)
+                                    query.from('categories').where('name', 'like',`%${body.name}%`)
                                     
                             }).paginate(body.page ?? 1, 10)
 
