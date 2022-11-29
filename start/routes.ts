@@ -38,6 +38,8 @@ Route.group(()=>{
 
     Route.resource('/category', 'CategoriesController').apiOnly()
     Route.post('/category/verify_order', 'CategoriesController.verifyOrderExists')
+
+    Route.resource('/product', 'ProductsController').apiOnly()
     
   }).middleware('auth')
 

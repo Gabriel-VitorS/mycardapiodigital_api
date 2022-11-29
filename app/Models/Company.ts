@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, HasMany, hasMany, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import Configuration from './Configuration'
 import Category from './Category'
+import Product from './Product'
 export default class Company extends BaseModel {
   @column({ isPrimary: true })
   public id: number
@@ -11,6 +12,9 @@ export default class Company extends BaseModel {
 
   @hasMany(()=>Category)
   public category: HasMany<typeof Category>
+
+  @hasMany(()=>Product)
+  public product: HasMany<typeof Product>
 
   @column()
   public name: string

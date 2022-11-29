@@ -1,4 +1,4 @@
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+//import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Env from '@ioc:Adonis/Core/Env'
 
 export default class Controller {
@@ -9,4 +9,8 @@ export default class Controller {
     public async getUrlBannerImage(banner){
         return banner !== null ? `${Env.get('HOST')}/api/image_banner/${banner}` :  `${Env.get('HOST')}/api/image_banner/padrao.png`
     } 
+
+    public async getUrlProductImage(image){
+        return image !== null ? `${Env.get('HOST')}/api/image_product/${image}` :  `${Env.get('HOST')}/api/image_product/padrao.png`
+    }
 }
