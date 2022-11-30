@@ -173,16 +173,16 @@ export default class ProductsController extends Controller {
             .andWhere((query)=>{
 
                 if(body.name)
-                    query.from('categories').where('name', 'like',`%${body.name}%`)
+                    query.from('products').where('name', 'like',`%${body.name}%`)
 
                 if(body.category_id)
-                    query.from('categories').where('category_id', `${body.category_id}`)
+                    query.from('products').where('category_id', `${body.category_id}`)
 
                 if(body.highlight)
-                    query.from('categories').where('highlight', `${body.highlight}`)
+                    query.from('products').where('highlight', `${body.highlight}`)
 
                 if(body.visible_online)
-                    query.from('categories').where('visible_online', `${body.visible_online}`)
+                    query.from('products').where('visible_online', `${body.visible_online}`)
                     
             }).paginate(body.page ?? 1, 15)
 
