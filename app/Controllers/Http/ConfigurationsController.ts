@@ -58,9 +58,9 @@ export default class ConfigurationsController extends Controller {
         
     }
 
-    public async store({request,auth, response}:HttpContextContract){
+    public async store({request, response}:HttpContextContract){
         const body = request.all()
-        const companyAuth = auth.user
+        const companyAuth = request.input('auth')
 
         try {
 
@@ -114,9 +114,9 @@ export default class ConfigurationsController extends Controller {
         }       
     }
 
-    public async destroy({params, auth, response}:HttpContextContract){
+    public async destroy({params, request, response}:HttpContextContract){
         const id = params.id
-        const companyAuth: any = auth.user 
+        const companyAuth: any = request.input('auth') 
         
 
         try {
@@ -146,8 +146,8 @@ export default class ConfigurationsController extends Controller {
 
     }
 
-    public async index({response, auth}: HttpContextContract){
-        const companyAuth: any = auth.user
+    public async index({response, request}: HttpContextContract){
+        const companyAuth: any = request.input('auth')
 
         try {
             const configuration = await Database.from('configurations').where('company_id', companyAuth.id).first()
@@ -172,9 +172,9 @@ export default class ConfigurationsController extends Controller {
         
     }
 
-    public async update({params, auth, response, request}: HttpContextContract){
+    public async update({params, response, request}: HttpContextContract){
         const body = request.all()
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
         const configurarionId = params.id
 
 

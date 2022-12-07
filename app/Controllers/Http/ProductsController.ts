@@ -31,9 +31,9 @@ export default class ProductsController extends Controller {
         size: '5mb'
     }
 
-    public async store({response, request, auth}:HttpContextContract){
+    public async store({response, request}:HttpContextContract){
         const body = request.all()
-        const companyAuth: any = auth.user     
+        const companyAuth: any = request.input('auth')     
 
 
         try {
@@ -79,9 +79,9 @@ export default class ProductsController extends Controller {
         
     }
 
-    public async destroy({auth, response, params}){
+    public async destroy({request, response, params}:HttpContextContract){
         const id = params.id 
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
 
         try{
             const product = await Product.query().where('id', id).where('company_id', companyAuth.id).first()
@@ -110,9 +110,9 @@ export default class ProductsController extends Controller {
 
     }
 
-    public async show({params, response, auth}:HttpContextContract){
+    public async show({params, response, request}:HttpContextContract){
         const id: number = params.id 
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
 
         try {
 
@@ -153,8 +153,8 @@ export default class ProductsController extends Controller {
         
     }
 
-    public async index({auth, response, request}:HttpContextContract){
-        const companyAuth: any = auth.user
+    public async index({response, request}:HttpContextContract){
+        const companyAuth: any = request.input('auth')
         const body =  request.all()
 
         await request.validate({
@@ -202,9 +202,9 @@ export default class ProductsController extends Controller {
 
     }
 
-    public async update({auth,request,response,params}:HttpContextContract){
+    public async update({request,response,params}:HttpContextContract){
         const id: number = params.id 
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
         const body = request.all()
 
         try {

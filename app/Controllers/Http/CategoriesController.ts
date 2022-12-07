@@ -13,9 +13,9 @@ export default class CategoriesController {
         order: schema.number()
     })
 
-    public async verifyOrderExists({auth, response, request}:HttpContextContract){
+    public async verifyOrderExists({response, request}:HttpContextContract){
         const body = request.all()
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
         
         try {
 
@@ -43,9 +43,9 @@ export default class CategoriesController {
 
     }
 
-    public async store({auth, response, request}:HttpContextContract){
+    public async store({response, request}:HttpContextContract){
         const body = request.all()
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
         //const category = await Category.create(body)
         
         try {
@@ -77,10 +77,10 @@ export default class CategoriesController {
 
     }
 
-    public async update({auth, response, request, params}: HttpContextContract){
+    public async update({response, request, params}: HttpContextContract){
         const body = request.all()
         const id: number = params.id
-        const companyAuth: any = auth.user    
+        const companyAuth: any = request.input('auth')    
 
         try {
 
@@ -124,9 +124,9 @@ export default class CategoriesController {
 
     }
 
-    public async destroy({auth, response, params}:HttpContextContract){
+    public async destroy({request, response, params}:HttpContextContract){
         const id = params.id
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
 
         try {
 
@@ -150,8 +150,8 @@ export default class CategoriesController {
         }
     }
 
-    public async index({auth, response, request}:HttpContextContract){
-        const companyAuth: any = auth.user
+    public async index({response, request}:HttpContextContract){
+        const companyAuth: any = request.input('auth')
         const body =  request.all()
 
         try {
@@ -185,9 +185,9 @@ export default class CategoriesController {
 
     }
 
-    public async show({auth, params, response}: HttpContextContract){
+    public async show({request, params, response}: HttpContextContract){
         const id: number = params.id
-        const companyAuth: any = auth.user
+        const companyAuth: any = request.input('auth')
 
         try {
             

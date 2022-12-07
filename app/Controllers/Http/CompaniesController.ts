@@ -1,6 +1,8 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Hash from '@ioc:Adonis/Core/Hash'
+import * as jose from 'jose'
+import Env from '@ioc:Adonis/Core/Env'
 
 import Company from 'App/Models/Company'
 import Database from '@ioc:Adonis/Lucid/Database'
@@ -60,6 +62,24 @@ export default class CompaniesController extends Controller {
 
     }
 
+    public async get({request, response}:HttpContextContract){
+        try {
+            const companyAuth: any = request.input('auth')
+
+            const company = await Company.query().where('id', companyAuth.id).first()
+            
+            return company
+            
+        } catch (error) {
+            response.status(500)
+            return {
+                message: 'Server error',
+                error: error
+            }
+        }
+        
+    }
+
     public async store({request, response}:HttpContextContract){
         const body = request.body()
 
@@ -94,7 +114,7 @@ export default class CompaniesController extends Controller {
 
     }
 
-    public async login({request, auth, response}:HttpContextContract){
+    public async login({request, response}:HttpContextContract){
         const body = request.all()
 
         const postRequestValidate = schema.create({
@@ -109,9 +129,38 @@ export default class CompaniesController extends Controller {
         try {
             await request.validate({schema: postRequestValidate})
 
-            const token =  await auth.use('api').attempt(body.email, body.password)
+            const company = await Company.query().where('email', body.email).first()
+
+            if(!company){
+                response.status(422)
+                return{
+                    message: 'Invalid user'
+                }
+            }
+
+            if(await !Hash.verify(company.password, body.password)){
+                response.status(422)
+                return{
+                    message: 'Invalid user'
+                }
+            }
+
+            const iat = Math.floor(Date.now() / 1000);
+            const exp = iat + 60* 60 //1h
+
+            const token = await new jose.SignJWT({
+                id:company.id,
+                name: company.name
+            })
+            .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
+            .setExpirationTime(exp)
+            .setIssuedAt(iat)
+            .setNotBefore(iat)
+            .sign(new TextEncoder().encode(Env.get('JWT_KEY')))
+            
     
             return {data: token}
+
         } catch (error) {
             response.status(500)
             return{
@@ -123,9 +172,9 @@ export default class CompaniesController extends Controller {
 
     }
 
-    public async update({request, response, auth}:HttpContextContract){
+    public async update({request, response}:HttpContextContract){
         const body = request.all()
-        const companyAuth = auth.user
+        const companyAuth = request.input('auth')
         const company = await Company.findOrFail(companyAuth?.id)
 
         await request.validate({schema: this.putRequestValidate})
@@ -248,7 +297,7 @@ export default class CompaniesController extends Controller {
             },
             highlight: productsHighlight, 
             company: companyId,
-            products: category
+            categories: category
 
         }
     }

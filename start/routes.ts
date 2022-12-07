@@ -17,7 +17,6 @@
 | import './routes/customer'
 |
 */
-
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(()=>{
@@ -33,6 +32,7 @@ Route.group(()=>{
   Route.group(()=>{
 
     Route.put('/company', 'CompaniesController.update')
+    Route.get('/company', 'CompaniesController.get')
 
     Route.resource('/configuration', 'ConfigurationsController').apiOnly()
     Route.post('/configuration/verify_url', 'ConfigurationsController.verifyIfUrlExist')
@@ -42,6 +42,6 @@ Route.group(()=>{
 
     Route.resource('/product', 'ProductsController').apiOnly()
     
-  }).middleware('auth')
+  }).middleware('apiAuth')
 
 }).prefix('/api')
