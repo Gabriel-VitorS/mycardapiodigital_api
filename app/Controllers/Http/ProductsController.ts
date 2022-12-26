@@ -34,9 +34,9 @@ export default class ProductsController extends Controller {
     public async store({response, request}:HttpContextContract){
         const body = request.all()
         const companyAuth: any = request.input('auth')     
+        delete body.auth
 
-
-        try {
+        try { 
             await request.validate({schema: this.requestValidate})
         
             const category = await Category.query().where('id', body.category_id).where('company_id', companyAuth.id).first()
@@ -184,7 +184,9 @@ export default class ProductsController extends Controller {
                 if(body.visible_online)
                     query.from('products').where('visible_online', `${body.visible_online}`)
                     
-            }).paginate(body.page ?? 1, 15)
+            })
+            .orderBy('created_at', 'desc')
+            .paginate(body.page ?? 1, 15)
 
             return {
                 data: products
@@ -266,5 +268,15 @@ export default class ProductsController extends Controller {
         }
         
 
+    }
+
+    public async image({response, params}: HttpContextContract) {
+        const imageParam = params.image
+        
+        const product = await Product.query().where('image', imageParam).first()
+        const imagePath = Application.tmpPath(`products/company_${product?.company_id}/${imageParam}`)
+        
+        response.download(imagePath)
+        
     }
 }
