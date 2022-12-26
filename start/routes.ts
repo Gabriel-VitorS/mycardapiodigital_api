@@ -28,7 +28,7 @@ Route.group(()=>{
   Route.post('/verify_email', 'CompaniesController.verifyIfEmailExist')
   Route.post('/login', 'CompaniesController.login')
   Route.get('/menu/:url', 'CompaniesController.menu')
-  
+  Route.get('/image_product/:image', 'ProductsController.image')
   Route.group(()=>{
 
     Route.put('/company', 'CompaniesController.update')
