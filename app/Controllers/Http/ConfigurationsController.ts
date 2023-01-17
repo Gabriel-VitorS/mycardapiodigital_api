@@ -61,7 +61,8 @@ export default class ConfigurationsController extends Controller {
     public async store({request, response}:HttpContextContract){
         const body = request.all()
         const companyAuth = request.input('auth')
-
+        delete body.auth
+        
         try {
 
             await request.validate({schema: this.postValidate})
@@ -249,6 +250,18 @@ export default class ConfigurationsController extends Controller {
         }
     
 
+    }
+
+    public async imageLogo({response, params}: HttpContextContract) {
+        const imageParam = params.image
+        const imagePath = Application.tmpPath(`logos/${imageParam}`)
+        response.download(imagePath)
+    }
+
+    public async imageBanner({response, params}: HttpContextContract) {
+        const imageParam = params.image
+        const imagePath = Application.tmpPath(`banners/${imageParam}`)
+        response.download(imagePath)
     }
 
 }
