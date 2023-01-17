@@ -46,8 +46,8 @@ export default class CategoriesController {
     public async store({response, request}:HttpContextContract){
         const body = request.all()
         const companyAuth: any = request.input('auth')
-        //const category = await Category.create(body)
-        
+        delete body.auth
+
         try {
 
             await request.validate({schema: this.requestValidate})
@@ -159,6 +159,7 @@ export default class CategoriesController {
             await request.validate({schema: 
                     schema.create({
                     page: schema.number.optional(),
+                    limit: schema.number.optional(),
                     name: schema.string.optional()
                     })
                 })
@@ -169,7 +170,9 @@ export default class CategoriesController {
                                 if(body.name)
                                     query.from('categories').where('name', 'like',`%${body.name}%`)
                                     
-                            }).paginate(body.page ?? 1, 10)
+                            })
+                            .orderBy('created_at', 'desc')
+                            .paginate(body.page ?? 1, body.limit ?? 15)
 
             return {
                 data: categories
