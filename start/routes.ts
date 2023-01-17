@@ -29,6 +29,8 @@ Route.group(()=>{
   Route.post('/login', 'CompaniesController.login')
   Route.get('/menu/:url', 'CompaniesController.menu')
   Route.get('/image_product/:image', 'ProductsController.image')
+  Route.get('/image_banner/:image', 'ConfigurationsController.imageBanner')
+  Route.get('/image_logo/:image', 'ConfigurationsController.imageLogo')
   Route.group(()=>{
 
     Route.put('/company', 'CompaniesController.update')
