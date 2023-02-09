@@ -270,6 +270,47 @@ export default class ProductsController extends Controller {
 
     }
 
+    public async menuProduct({params, response}: HttpContextContract){
+        const id: number = params.id 
+
+        try {
+
+            const product = await Database.from('products').where('id', id).first()
+
+            if(!product){
+                response.status(404)
+                return {
+                    message:'Product not find'
+                }
+            }
+
+            const urlImage = await this.getUrlProductImage(product.image)
+
+            product.url_image = urlImage
+
+
+            delete product.updated_at
+            delete product.created_at
+            delete product.highlight
+            delete product.id
+            delete product.visible_online
+            delete product.company_id
+            delete product.category_id
+
+            
+            return{
+                data: product
+            }
+            
+        } catch (error) {
+            response.status(500)
+            return{
+                message: "serve error",
+                error: error
+            }
+        }
+    }
+
     public async image({response, params}: HttpContextContract) {
         const imageParam = params.image
         

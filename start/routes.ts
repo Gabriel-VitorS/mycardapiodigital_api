@@ -28,6 +28,7 @@ Route.group(()=>{
   Route.post('/verify_email', 'CompaniesController.verifyIfEmailExist')
   Route.post('/login', 'CompaniesController.login')
   Route.get('/menu/:url', 'CompaniesController.menu')
+  Route.get('/menu/product/:id', 'ProductsController.menuProduct')
   Route.get('/image_product/:image', 'ProductsController.image')
   Route.get('/image_banner/:image', 'ConfigurationsController.imageBanner')
   Route.get('/image_logo/:image', 'ConfigurationsController.imageLogo')
