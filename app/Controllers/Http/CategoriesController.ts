@@ -134,12 +134,12 @@ export default class CategoriesController {
 
             if(!category){
                 response.status(404)
-                return {message:'Configuration not find'}
+                return {message:'Category not find'}
             }
 
             await category.delete()
 
-            return {message:'Configuration deleted successfully', data: category.id}
+            return {message:'Category deleted successfully', data: category.id}
 
         } catch (error) {
             response.status(500)
