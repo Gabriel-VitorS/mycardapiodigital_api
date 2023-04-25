@@ -47,7 +47,7 @@ export default class CompaniesController extends Controller {
         try {
             const email = await Database.from('companies').where('email', request.input('email'))
   
-            if(Object.keys(email).length !== 0)
+            if(Object.keys(email).length > 0)
                 return {isValid: false}
             else
                 return {isValid: true}
@@ -63,12 +63,32 @@ export default class CompaniesController extends Controller {
     }
 
     public async get({request, response}:HttpContextContract){
+
         try {
             const companyAuth: any = request.input('auth')
 
             const company = await Company.query().where('id', companyAuth.id).first()
             
-            return company
+            if(!company){
+                response.status(402)
+                return
+            }
+                       
+            interface CompanyResponse {
+                name: string;
+                id: number;
+                cpf_cnpj: string;
+                email: string
+            }
+
+            const companyNoPassword: CompanyResponse = {
+                name: company.name, 
+                id: company.id, 
+                cpf_cnpj: company.cpf_cnpj,
+                email: company.email
+            }
+            
+            return companyNoPassword
             
         } catch (error) {
             response.status(500)
@@ -138,7 +158,7 @@ export default class CompaniesController extends Controller {
                 }
             }
 
-            if(await !Hash.verify(company.password, body.password)){
+            if(await Hash.verify(company.password, body.password) == false){
                 response.status(422)
                 return{
                     message: 'Invalid user'
@@ -146,7 +166,7 @@ export default class CompaniesController extends Controller {
             }
 
             const iat = Math.floor(Date.now() / 1000);
-            const exp = iat + 60* 60 //1h
+            const exp = iat + 60* 60 *60 //1h
 
             const token = await new jose.SignJWT({
                 id:company.id,
@@ -266,7 +286,7 @@ export default class CompaniesController extends Controller {
         /**
          * Seleciona a categoria de acordo com a ordem que foi definida e pega os produtos de acordo com a categoria
          */
-        const category = await Database.from('categories').where('company_id', companyId).orderBy('order', 'asc')
+        let category = await Database.from('categories').where('company_id', companyId).orderBy('order', 'asc')
 
         if(category){
 
@@ -284,9 +304,12 @@ export default class CompaniesController extends Controller {
 
                     products[index].url_image = await this.getUrlProductImage(products[index].image)
                 })
-
+                
                 category[i].products = products
+                
             }
+
+            category = category.filter(item => item.products.length >= 1)
         }
 
         return {
