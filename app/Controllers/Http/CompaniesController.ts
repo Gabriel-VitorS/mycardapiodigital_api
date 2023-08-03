@@ -45,8 +45,7 @@ export default class CompaniesController extends Controller {
 
     public async verifyIfEmailExist({request, response}:HttpContextContract){
         try {
-            const email = await Database.from('companies').where('email', request.input('email'))
-  
+            const email = await Database.from('companies').where('email', request.input('email').email)
             if(Object.keys(email).length > 0)
                 return {isValid: false}
             else
@@ -167,7 +166,7 @@ export default class CompaniesController extends Controller {
 
             const iat = Math.floor(Date.now() / 1000);
             const exp = iat + 60* 60 *60 //1h
-
+            // const exp = iat + 60* 60 *60 //1h
             const token = await new jose.SignJWT({
                 id:company.id,
                 name: company.name
@@ -179,7 +178,7 @@ export default class CompaniesController extends Controller {
             .sign(new TextEncoder().encode(Env.get('JWT_KEY')))
             
     
-            return {data: token}
+            return {token: token}
 
         } catch (error) {
             response.status(500)
@@ -261,7 +260,7 @@ export default class CompaniesController extends Controller {
             return {message:'menu not find'}
         }
 
-        const companyId = configuration.id
+        const companyId = configuration.company_id
 
         const urlLogo = await this.getUrlLogoImage(configuration.logo_image)
         const urlBanner = await this.getUrlBannerImage(configuration.banner_image)

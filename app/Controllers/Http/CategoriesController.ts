@@ -19,14 +19,15 @@ export default class CategoriesController {
         
         try {
 
-            await request.validate({ schema: schema.create({ order: schema.number() }) })
+            await request.validate({ schema: schema.create({ order: schema.number(), id: schema.number() }) })
 
             const order = await Database.from('categories').where('company_id', companyAuth.id).where('order', body.order).first()
 
-            if( (order) && order.company_id === companyAuth.id){
-                return {
-                    isValid: false
-                }
+            if(order){
+                if(order.id == body.id)
+                    return {isValid: true}
+                else
+                    return {isValid: false}
             }
 
             return {
@@ -174,9 +175,7 @@ export default class CategoriesController {
                             .orderBy('created_at', 'desc')
                             .paginate(body.page ?? 1, body.limit ?? 15)
 
-            return {
-                data: categories
-            }
+            return categories
             
         } catch (error) {
             response.status(500)
@@ -201,9 +200,7 @@ export default class CategoriesController {
                 return {message:'Configuration not find'}
             }
 
-            return {
-                data: category
-            }
+            return category
             
         } catch (error) {
             response.status(500)

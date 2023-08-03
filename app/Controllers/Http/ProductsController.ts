@@ -134,14 +134,11 @@ export default class ProductsController extends Controller {
 
                 product.category_name = category?.name
 
-                return{
-                    data: product
-                }
+                return product
+                
             }
 
-            return{
-                data: product
-            }
+            return product
 
         } catch (error) {
             response.status(500)
@@ -182,15 +179,13 @@ export default class ProductsController extends Controller {
                     query.from('products').where('highlight', `${body.highlight}`)
 
                 if(body.visible_online)
-                    query.from('products').where('visible_online', `${body.visible_online}`)
+                    query.from('products').where('visible_online', `${body.visible_online == 1 ? '1' : 'false'}`)
                     
             })
             .orderBy('created_at', 'desc')
             .paginate(body.page ?? 1, 15)
 
-            return {
-                data: products
-            }
+            return products
 
         } catch (error) {
 

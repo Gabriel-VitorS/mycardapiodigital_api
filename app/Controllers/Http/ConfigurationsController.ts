@@ -30,7 +30,7 @@ export default class ConfigurationsController extends Controller {
     }
 
     public async verifyIfUrlExist({request, response}:HttpContextContract){
-
+        const companyAuth = request.input('auth')
         try {
             const urlRequestValidate = schema.create({
                 url: schema.string([
@@ -42,10 +42,13 @@ export default class ConfigurationsController extends Controller {
             await request.validate({schema: urlRequestValidate})
 
             const url = await Database.from('configurations').where('url', '=' , request.input('url')).first()
+            if(url){
+                if(url.company_id == companyAuth.id)
+                    return {isValid: true}
 
-            if(url)
                 return {isValid: false}
-            else
+
+            }else
                 return {isValid: true}
 
         } catch (error) {
@@ -152,16 +155,26 @@ export default class ConfigurationsController extends Controller {
 
         try {
             const configuration = await Database.from('configurations').where('company_id', companyAuth.id).first()
-
+            if(configuration == null){
+                response.status(200)
+                return {
+                    id: 0,
+                    company_id: companyAuth.id,
+                    name_company: '',
+                    url: '',
+                    banner_image: '',
+                    logo_image: '',
+                    created_at: '',
+                    updated_at: '',
+                }
+            }
             const urlLogo = await this.getUrlLogoImage(configuration.logo_image)
             const urlBanner = await this.getUrlBannerImage(configuration.banner_image)
     
             configuration.url_logo = urlLogo
             configuration.url_banner = urlBanner
     
-            return {
-                data: configuration
-            }
+            return configuration
 
         } catch (error) {
             response.status(500)
