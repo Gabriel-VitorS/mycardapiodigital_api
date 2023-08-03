@@ -54,7 +54,7 @@
   "dependencies": {
     "@adonisjs/auth": "^8.2.3",
     "@adonisjs/core": "^5.8.8",
-    "@adonisjs/lucid": "^18.2.0",
+    "@adonisjs/lucid": "^18.4.0",
     "@adonisjs/repl": "^3.1.11",
     "jose": "^4.11.1",
     "jsonwebtoken": "^8.5.1",
